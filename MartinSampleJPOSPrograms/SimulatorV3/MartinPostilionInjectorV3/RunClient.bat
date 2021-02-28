@@ -1,0 +1,1 @@
+java -jar MartinPostilionInjector.jar C:\Users\Administrator\Desktop\Program\config\config.properties
