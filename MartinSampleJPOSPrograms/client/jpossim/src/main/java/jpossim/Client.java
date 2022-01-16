@@ -3,6 +3,9 @@ package jpossim;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.internal.DefaultLogBuilder;
 import org.jpos.iso.BaseChannel;
 import org.jpos.iso.ISOException;
 import org.jpos.iso.ISOMsg;
@@ -15,8 +18,11 @@ import jpossim.util.ISOArray;
 
 public class Client {
 
+	
 	public static void main(String[] args) throws IOException, ISOException, InterruptedException {
 		// TODO Auto-generated method stub
+		final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
+		LOGGER.info("Starting Program");
 		System.out.println("Starting Client");
 		System.out.println("Running Application");
 		String propertyFileLocation = args[0];
