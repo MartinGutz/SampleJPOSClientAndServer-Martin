@@ -7,7 +7,10 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+
 public class ConfigReader {
+	final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 	String result = "";
 	InputStream inputStream;
  
@@ -16,18 +19,15 @@ public class ConfigReader {
 		Hashtable<String,String> propertyDictionary = new Hashtable<String,String>();
 		try {
 			Properties prop = new Properties();
-			
-			// Need to place the values into the hashtable
-			// Need to pass the hashtable back to the main class
-			
 			inputStream = new FileInputStream(propertyFileLocation);
  
+			LOGGER.debug("Attempting to read the property file");
 			if (inputStream != null) {
 				prop.load(inputStream);
 			} else {
+				LOGGER.error("Property file '" + propertyFileLocation + "' not found");
 				throw new FileNotFoundException("property file '" + propertyFileLocation + "' not found");
 			}
- 
 			String[] propertyNames = {"user","password","packagerLocation","remoteServerPort"
 					,"remoteServerHostname","messageTypeIndicatorColumnName","dataelementColumnIndicator"
 					,"subelementColumnIndicator","sqlDriverClass","sqlConnectionString"
@@ -36,10 +36,10 @@ public class ConfigReader {
 			for(String property : propertyNames)
 			{
 				propertyDictionary.put(property, prop.getProperty(property));
-				System.out.println("Found the [ " + property + " ] property: " + prop.getProperty(property));
+				LOGGER.debug("Found the [ " + property + " ] property: " + prop.getProperty(property));
 			}
 		} catch (Exception e) {
-			System.out.println("Exception: " + e);
+			LOGGER.error(e);
 		} finally {
 			inputStream.close();
 		}

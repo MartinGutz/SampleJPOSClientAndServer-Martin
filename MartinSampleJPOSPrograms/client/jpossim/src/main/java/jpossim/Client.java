@@ -34,7 +34,8 @@ public class Client {
     	channel.connect();
     	Long sleepValue = Long.parseLong(propertyDictionary.get("sleepMilliseconds"));
     	int timeoutValue = Integer.parseInt(propertyDictionary.get("channelTimeoutMilliseconds"));
-    	System.out.println("Channel Timeout set to " + timeoutValue + " milliseconds");
+    	LOGGER.debug("Channel Timeout set to " + timeoutValue + " milliseconds");
+    	//System.out.println("Channel Timeout set to " + timeoutValue + " milliseconds");
     	while(true)
         {
             ISOArray isoArray = DatabaseConnection.getPendingMessage(propertyDictionary);
@@ -43,28 +44,29 @@ public class Client {
             	LOGGER.debug("No Pending Messages Found");
             }else
             {
-            	System.out.println("ID Number: " + isoArray.getIdNumber());
+            	LOGGER.info("Attempting to Process ID Number: " + isoArray.getIdNumber());
+            	//System.out.println("ID Number: " + isoArray.getIdNumber());
                 ISOMsg request = isoArray.getMessage();
                 
                 request.dump(System.out, "request: ");
                 if(channel.isConnected())
                 {
                 	
-                	System.out.println("Attempting to send message");
+                	LOGGER.debug("Attempting to send message");
                 	channel.send(request);
                 }else
                 {
-                	System.out.println("Attempting to reconnect"); 
+                	LOGGER.error("Attempting to reconnect"); 
                 	channel.connect();
                 	
-                	System.out.println("Attempting to send message"); 
+                	LOGGER.debug("Attempting to send message"); 
                 	channel.send(request);	
                 }
                 channel.setTimeout(timeoutValue);
                 ISOMsg response = channel.receive();
                 
                 response.dump(System.out, "DUMP:");
-                System.out.println("Response: " + response.getValue(39)); 
+                LOGGER.debug("Response: " + response.getValue(39)); 
                 UpdateJPOSStatus.updateStatus(isoArray.getIdNumber(), response, propertyDictionary );
             }
             LOGGER.debug("Sleeping for " + sleepValue + " milliseconds");
