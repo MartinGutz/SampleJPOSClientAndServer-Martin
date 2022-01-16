@@ -23,16 +23,15 @@ public class Client {
 		// TODO Auto-generated method stub
 		final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 		LOGGER.info("Starting Program");
-		System.out.println("Starting Client");
-		System.out.println("Running Application");
 		String propertyFileLocation = args[0];
-		System.out.println("Property File Location Provided: " + propertyFileLocation);
+		//System.out.println("Property File Location Provided: " + propertyFileLocation);
+		LOGGER.info("Property File Location Provided: " + propertyFileLocation);
 		
 		ConfigReader reader = new ConfigReader();
 		Hashtable<String,String> propertyDictionary = reader.getPropValues(propertyFileLocation);
 		
 		ISOPackager gPackager = new GenericPackager(propertyDictionary.get("packagerLocation"));
-        int channelPort = Integer.parseInt(propertyDictionary.get("remoteServerPort")); 
+		int channelPort = Integer.parseInt(propertyDictionary.get("remoteServerPort")); 
     	BaseChannel channel = new PostChannel(propertyDictionary.get("remoteServerHostname"), channelPort, gPackager); 
     	channel.connect();
     	Long sleepValue = Long.parseLong(propertyDictionary.get("sleepMilliseconds"));
@@ -43,32 +42,31 @@ public class Client {
             ISOArray isoArray = DatabaseConnection.getPendingMessage(propertyDictionary);
             if(isoArray == null)
             {
-            	System.out.println("No Pending Messages Found"); //$NON-NLS-1$
+            	LOGGER.debug("No Pending Messages Found");
             }else
             {
-            	System.out.println("ID Number: " + isoArray.getIdNumber()); //$NON-NLS-1$
+            	System.out.println("ID Number: " + isoArray.getIdNumber());
                 ISOMsg request = isoArray.getMessage();
                 
                 request.dump(System.out, "request: ");
                 if(channel.isConnected())
                 {
                 	
-                	System.out.println("Attempting to send message"); //$NON-NLS-1$
+                	System.out.println("Attempting to send message");
                 	channel.send(request);
                 }else
                 {
-                	System.out.println("Attempting to reconnect"); //$NON-NLS-1$
+                	System.out.println("Attempting to reconnect"); 
                 	channel.connect();
                 	
-                	System.out.println("Attempting to send message"); //$NON-NLS-1$
+                	System.out.println("Attempting to send message"); 
                 	channel.send(request);	
                 }
                 channel.setTimeout(timeoutValue);
                 ISOMsg response = channel.receive();
                 
-                //System.out.println(ISOUtilities.doRender(response));
                 response.dump(System.out, "DUMP:");
-                System.out.println("Response: " + response.getValue(39)); //$NON-NLS-1$
+                System.out.println("Response: " + response.getValue(39)); 
                 UpdateJPOSStatus.updateStatus(isoArray.getIdNumber(), response, propertyDictionary );
             }
             System.out.println("Sleeping for " + sleepValue + " milliseconds");
