@@ -40,10 +40,11 @@ public class DatabaseConnection {
 				request = new ISOMsg();
 				for (int i = 1; i <= columnCount; i++ ) {
 				  String columnName = rsmd.getColumnName(i);
-				  System.out.println("Found Column Name:" + columnName);
+				  LOGGER.debug("Found Column Name:" + columnName);
 				  request.setMTI(rs.getString(messageTypeIndicatorColumnName));
 				  if(columnName.contains(elementSearchString))
 				  {
+					  
 					  System.out.println("Attempting to parse out the element location from: " + (columnName.substring(elementSearchString.length() + 1)));
 					  isoElementNumber = Integer.parseInt(columnName.substring(elementSearchString.length() + 1));
 					  System.out.println("Printing out the value:" + isoElementNumber);
@@ -60,7 +61,7 @@ public class DatabaseConnection {
 			rs.close();	
 			con.close();
 		} catch (Exception e) {
-			System.out.println(e);
+			LOGGER.error(e);
 		}
 		finally
 		{
