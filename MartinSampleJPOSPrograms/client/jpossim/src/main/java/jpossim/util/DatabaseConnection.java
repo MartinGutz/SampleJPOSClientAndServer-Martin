@@ -7,44 +7,43 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Hashtable;
 
+import org.apache.logging.log4j.LogManager;
 import org.jpos.iso.ISOMsg;
 
 public class DatabaseConnection {
 	public static ISOArray getPendingMessage(Hashtable<String,String> propertyDictionary)
 	{
+		final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 		ISOArray isoArray = new ISOArray();
-		ISOMsg request = null; //new ISOMsg();
-		String messageTypeIndicatorColumnName = propertyDictionary.get("messageTypeIndicatorColumnName"); //$NON-NLS-1$
-		String elementSearchString = propertyDictionary.get("dataelementColumnIndicator"); //$NON-NLS-1$
-		String subelementSearchString = propertyDictionary.get("subelementColumnIndicator"); //$NON-NLS-1$
-		System.out.println("Attempting try for getPendingMessages");
+		ISOMsg request = null; 
+		String messageTypeIndicatorColumnName = propertyDictionary.get("messageTypeIndicatorColumnName"); 
+		String elementSearchString = propertyDictionary.get("dataelementColumnIndicator"); 
+		String subelementSearchString = propertyDictionary.get("subelementColumnIndicator"); 
+		LOGGER.debug("Attempting try for getPendingMessages");
 		try {
-			Class.forName(propertyDictionary.get("sqlDriverClass")); //$NON-NLS-1$
-			Connection con = DriverManager.getConnection(propertyDictionary.get("sqlConnectionString")); //$NON-NLS-1$
+			Class.forName(propertyDictionary.get("sqlDriverClass")); 
+			Connection con = DriverManager.getConnection(propertyDictionary.get("sqlConnectionString")); 
 
 			String sql = propertyDictionary.get("getpendingMessagesProcedure");
-			System.out.println("Attempting to run stored procedure [" + propertyDictionary.get("getpendingMessagesProcedure") + "] to get results");
+			LOGGER.debug("Attempting to run stored procedure [" + propertyDictionary.get("getpendingMessagesProcedure") + "] to get results");
 			CallableStatement stmt = con.prepareCall(sql);
 			ResultSet rs = stmt.executeQuery();
 			
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 
-			// The column count starts from 1
 			int isoElementNumber = 0;
 			String subelementColumnName = null;
 			while (rs.next()) 
 			{
-				isoArray.setIdNumber(rs.getInt("id")); //$NON-NLS-1$
+				isoArray.setIdNumber(rs.getInt("id")); 
 				request = new ISOMsg();
 				for (int i = 1; i <= columnCount; i++ ) {
 				  String columnName = rsmd.getColumnName(i);
 				  System.out.println("Found Column Name:" + columnName);
-				  // Setting the MTI
 				  request.setMTI(rs.getString(messageTypeIndicatorColumnName));
 				  if(columnName.contains(elementSearchString))
 				  {
-					  // Setting the data elements
 					  System.out.println("Attempting to parse out the element location from: " + (columnName.substring(elementSearchString.length() + 1)));
 					  isoElementNumber = Integer.parseInt(columnName.substring(elementSearchString.length() + 1));
 					  System.out.println("Printing out the value:" + isoElementNumber);
@@ -72,7 +71,7 @@ public class DatabaseConnection {
 		else
 		{
 			isoArray.setMessage(request);
-			System.out.println("ISO Message Found"); //$NON-NLS-1$
+			System.out.println("ISO Message Found"); 
 			return isoArray;
 		}		
 	}

@@ -20,11 +20,9 @@ public class Client {
 
 	
 	public static void main(String[] args) throws IOException, ISOException, InterruptedException {
-		// TODO Auto-generated method stub
 		final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger();
 		LOGGER.info("Starting Program");
 		String propertyFileLocation = args[0];
-		//System.out.println("Property File Location Provided: " + propertyFileLocation);
 		LOGGER.info("Property File Location Provided: " + propertyFileLocation);
 		
 		ConfigReader reader = new ConfigReader();
@@ -69,7 +67,7 @@ public class Client {
                 System.out.println("Response: " + response.getValue(39)); 
                 UpdateJPOSStatus.updateStatus(isoArray.getIdNumber(), response, propertyDictionary );
             }
-            System.out.println("Sleeping for " + sleepValue + " milliseconds");
+            LOGGER.debug("Sleeping for " + sleepValue + " milliseconds");
             Thread.sleep(sleepValue);
         }
 		
